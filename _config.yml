@@ -4,7 +4,7 @@ email: ustcxjy@gmail.com
 description: "blog"
 baseurl: ""
 url: "http://www.shalandis.com/"
-title_description: "玫瑰色的远方"
+title_description: "may my aim be true"
 title_image: "/favicons/title.png"
 post_limit: 5
 disqus_account: shalandis
@@ -12,7 +12,7 @@ disqus_account: shalandis
 
 github_username:  PinkGabriel
 # Social usernames/URLs
-#twitter_username: PinkGabriel
+twitter_username: snow168rain
 #linkedin_link: http://***
 #google_plus_link: http://***
 #stackoverflow_link: http://***

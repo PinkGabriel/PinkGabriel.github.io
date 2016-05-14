@@ -210,8 +210,10 @@ ul {
 	padding: 0px;
 
 	@media (min-width: $screen-sm-min) {
-		width: 933px;
-		max-width:1293px;
+		//width: 963px;
+		//max-width:1333px;
+		width: 70%;
+		max-width:80%;
 	}
 
 	.header {
@@ -501,13 +503,13 @@ ul {
 		}
 
 		@media (min-width: $screen-md-min) {
-			width: 70%;
-			margin-left: 15%;
+			width: 80%;
+			margin-left: 10%;
 		}
 
 		@media (min-width: $screen-lg-min) {
-			width: 50%;
-			margin-left: 25%;
+			width: 70%;
+			margin-left: 15%;
 		}
 
 		.thumb {
