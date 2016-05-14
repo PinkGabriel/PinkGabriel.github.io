@@ -157,7 +157,7 @@ ul {
 }
 
 .links {
-	margin-top: 50px;
+	margin-top: 15px;
 	text-align: center;
 
 	i {
@@ -241,7 +241,7 @@ ul {
 		font-family: 'Montserrat', sans-serif;
 		color: $light-blue;
 		margin-top: 0px;
-		padding-top: 15px;
+		padding-top: 25px;
 		font-size: 30px;
 
 		@media (min-width: $screen-sm-min) {
@@ -271,10 +271,10 @@ ul {
 
 	.author-text {
 		text-align: center;
-		margin-top: 30px;
-
+		margin-top: 15px;
+		font-size: 25px;
 		b {
-			font-size: 32px;
+			font-size: 30px;
 		}
 	}
 
