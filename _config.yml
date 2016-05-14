@@ -4,21 +4,21 @@ email: ustcxjy@gmail.com
 description: "blog"
 baseurl: ""
 url: "http://www.shalandis.com/"
-title_description: "wow"
-title_image: #""
-github_repository: https://github.com/jacobtomlinson/carte-noire
+title_description: "玫瑰色的远方"
+title_image: "/favicons/title.png"
+#github_repository: https://github.com/***
 post_limit: 5
 
 # Social usernames/URLs
 #twitter_username: PinkGabriel
 github_username:  PinkGabriel
-#linkedin_link: http://carte-noire.jacobtomlinson.co.uk/
-#google_plus_link: http://carte-noire.jacobtomlinson.co.uk/
-#stackoverflow_link: http://carte-noire.jacobtomlinson.co.uk/
+#linkedin_link: http://***
+#google_plus_link: http://***
+#stackoverflow_link: http://***
 
 # Footer
-footer_left: "Made with <i class=\"fa fa-heart\"></i> by <a href=\"https://twitter.com/_JacobTomlinson\">Jacob Tomlinson</a>"
-footer_right: "&lt;/&gt; on <a href=\"https://github.com/jacobtomlinson/carte-noire\">Github</a> &nbsp;<i class=\"fa fa-github-alt\"></i>"
+footer_left: "Made with <i class=\"fa fa-heart\"></i> by <a href=\"https://twitter.com/snow168rain\">xjy</a>"
+footer_right: "on <a href=\"https://github.com/pinkgabriel\">Github</a> &nbsp;<i class=\"fa fa-github-alt\"></i>"
 
 # Build settings
 markdown: kramdown
