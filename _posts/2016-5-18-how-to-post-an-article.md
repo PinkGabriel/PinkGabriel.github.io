@@ -1,7 +1,8 @@
 ---
+layout:     post
 title:      How to post an article
 author:     Xue Jie Yu
-categories: introduction
+categories: Original
 thumbnail:  heart
 tags:
  - introduction
