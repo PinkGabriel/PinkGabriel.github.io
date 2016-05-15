@@ -1,7 +1,8 @@
 ---
 layout:     post
 title:      How to post an article
-author:     Xue Jie Yu
+date:	    2016-5-18
+summary:    way to post an article.
 categories: Original
 thumbnail:  heart
 tags:
