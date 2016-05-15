@@ -14,19 +14,21 @@ Go to [here](https://github.com/PinkGabriel/PinkGabriel.github.io/tree/master/_p
 
 # Step 2
 Name the article like `2016-5-18-hello-world.md` (year-month-date-title)
-![]()
+![](http://i63.tinypic.com/fmphcg.jpg)
 
 # Step 3
 Make sure your article begin with the following part:
 
 ```
 ---
-title: "hello world"
-categories:
-  - blog
+layout:     post
+title:      How to post an article
+date:       2016-5-18
+summary:    way to post an article.
+categories: Original
+thumbnail:  heart
 tags:
-  - markdown
-  - newpost
+ - introduction
 ---
 
 You can write your content here(use markdown).
@@ -41,11 +43,11 @@ You can write your content here(use markdown).
 # Step 4
 Leave a message and commit the article!
 Done!
-![]()
+![](http://i64.tinypic.com/2wevq89.jpg)
 
 # Markdown syntax
 Markdown is easy,have a look at: [https://www.zybuluo.com/mdeditor](https://www.zybuluo.com/mdeditor)
 
-# Photoes?
+# Photos?
 Don't upload images to this repository, Github Pages have little space.
-Try [http://tinypic.com](http://tinypic.com/) to compress photoes.
+Try [http://tinypic.com](http://tinypic.com/) to store photos.
