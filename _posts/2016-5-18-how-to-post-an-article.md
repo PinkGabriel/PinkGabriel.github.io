@@ -10,11 +10,10 @@ tags:
 ---
 
 # Step 1
-Go to [here](https://github.com/PinkGabriel/PinkGabriel.github.io/tree/master/_posts)
+Go to [here](https://github.com/PinkGabriel/PinkGabriel.github.io/tree/master/_posts) and create new file.
 
 # Step 2
-Name the article like `2016-5-18-hello-world.md` (year-month-date-title)
-![](http://i63.tinypic.com/fmphcg.jpg)
+Name the article like `2016-5-18-hello-world.md` (year-month-date-title).
 
 # Step 3
 Make sure your article begin with the following part:
@@ -43,7 +42,7 @@ You can write your content here(use markdown).
 # Step 4
 Leave a message and commit the article!
 Done!
-![](http://i64.tinypic.com/2wevq89.jpg)
+![](http://i66.tinypic.com/5wnk7.jpg)
 
 # Markdown syntax
 Markdown is easy,have a look at: [https://www.zybuluo.com/mdeditor](https://www.zybuluo.com/mdeditor)
