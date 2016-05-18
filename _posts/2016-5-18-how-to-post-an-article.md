@@ -45,7 +45,7 @@ Done!
 ![](http://i66.tinypic.com/5wnk7.jpg)
 
 # Markdown syntax
-Markdown is easy,have a look at: [https://www.zybuluo.com/mdeditor](https://www.zybuluo.com/mdeditor)
+Markdown is easy, have a look at: [https://www.zybuluo.com/mdeditor](https://www.zybuluo.com/mdeditor)
 
 # Photos?
 Don't upload images to this repository, Github Pages have little space.
