@@ -77,7 +77,6 @@ And then in `librados::IoCtxImpl::operate`, **oid** and **oloc**(comprising **po
 Through all kinds of encapsulations, we arrive at this level: `_calc_target`. We get still unchanged **oid** and **poolid**. And we read out the informations of the target **pool**. 
 
 ![oid&oloc](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c2.png) 
-
 ![pool](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c3_2.png) 
 
 (in my cluster, pool "neo" id is 29, name of object to write is "neo-obj") 
@@ -133,7 +132,6 @@ void do_rule(int rule, int x, vector<int>& out, int maxout, const vector<__u32>&
 Let's see some parameters in runtime. `x` is the `pps` we've got, rule is the crushrule's number in memory(not ruleid, in my crushrule set, this rule's id is 3), `weight` is **reweight** we've mentioned and it's scaled up from 1 to 65536. Then we define `rawout[maxout]` to store OSD set, `scratch[maxout * 3]` for calculation use. Then we go into **crush_do_rule**.
 
 ![2nd](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c16.png)
-
 ![2nd](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c17.png)
 
 #### **PGID -> OSDset OUTLINE**
