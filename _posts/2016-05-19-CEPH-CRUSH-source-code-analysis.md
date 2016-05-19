@@ -1,8 +1,8 @@
 ---
 layout:     post
-title:      CEPH CRUSH algorithm source code analysis
+title:      CEPH CRUSH source code analysis
 date:	    2016-5-19
-summary:    CRUSH analysis
+summary:    CRUSH algorithm analysis
 categories: Original
 thumbnail:  cogs
 tags:
@@ -45,11 +45,14 @@ As we know, CRUSH core function is `crush_do_rule`(mapper.c line 785). By this f
 
 The function stack is like this:
 ```
-#12 main 
-#11 rados_write 
-#10 librados::IoCtxImpl::write 
-#9 librados::IoCtxImpl::operate 
-#8 Objecter::op_submit 
+
+#12 main
+
+#11 rados_write
+
+#10 librados::IoCtxImpl::write
+#9 librados::IoCtxImpl::operate
+#8 Objecter::op_submit
 #7 Objecter::_op_submit_with_budget
 #6 Objecter::_op_submit
 #5 Objecter::_calc_target
@@ -106,19 +109,19 @@ P.S. you can find something in PG's name and object name.
 ### 2.2 PGID ---> OSD set
 Before we get started in this part, we must make clear several concepts.
 
-**weight** VS **reweight**
+*weight* VS *reweight*
 
 ![weight&reweight](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c15.png)
-
 [ref](http://cephnotes.ksperis.com/blog/2014/12/23/difference-between-ceph-osd-reweight-and-ceph-osd-crush-reweight) here. 
-
 “**ceph osd crush reweight**” sets the CRUSH weight of the OSD. This weight is an arbitrary value (generally the size of the disk in TB or something) and controls how much data the system tries to allocate to the OSD.
 “**ceph osd reweight**” sets an override weight on the OSD. This value is in the range 0 to 1, and forces CRUSH to re-place (1-weight) of the data that would otherwise live on this drive. It does *not* change the weights assigned to the buckets above the OSD, and is a corrective measure in case the normal CRUSH distribution isn’t working out quite right. (For instance, if one of your OSDs is at 90% and the others are at 50%, you could reduce this weight to try and compensate for it.)
 
-**primary-affinity**
+*primary-affinity*
+
 Primary affinity is 1 by default (i.e., an OSD may act as a primary). You may set the OSD primary range from 0-1, where 0 means that the OSD may NOT be used as a primary and 1 means that an OSD may be used as a primary. When the weight is < 1, it is less likely that CRUSH will select the Ceph OSD Daemon to act as a primary.
 
-**PG** VS **PGP**
+*PG* VS *PGP*
+
 pg-num is the number of PGs, pgp-num is the number of PGs that will be considered for placement, i.e. it's the pgp-num value that is used by CRUSH, not pg-num. For example, consider pg-num = 1024 and pgp-num = 1. In that case you will see 1024 PGs but all of those PGs will map to the same set of OSDs. When you increase pg-num you are splitting PGs, when you increase pgp-num you are moving them, i.e. changing sets of OSDs they map to.
 PG and PGP are important concepts. More discuss can be seen [here](http://lists.ceph.com/pipermail/ceph-users-ceph.com/2015-May/001610.html)
 
