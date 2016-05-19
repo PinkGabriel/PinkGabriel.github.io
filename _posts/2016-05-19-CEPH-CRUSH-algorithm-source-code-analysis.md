@@ -77,6 +77,7 @@ And then in `librados::IoCtxImpl::operate`, **oid** and **oloc**(comprising **po
 ![pool](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c3_2.png)
 
 (in my cluster, pool "neo" id is 29, name of object to write is "neo-obj")
+
 4. In `object_locator_to_pg`, the **first calculation** begins: `ceph_str_hash` hashes object name into a `uint32_t` type value as so-called `ps`(placement seed)
 
 ![oidhash](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c6_2.png)
