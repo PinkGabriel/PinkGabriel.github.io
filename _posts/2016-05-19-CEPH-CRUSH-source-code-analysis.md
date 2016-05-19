@@ -80,33 +80,22 @@ Through all kinds of encapsulations, we arrive at this level: `_calc_target`. We
 (in my cluster, pool "neo" id is 29, name of object to write is "neo-obj") 
 
 In `object_locator_to_pg`, the **first calculation** begins: `ceph_str_hash` hashes object name into a `uint32_t` type value as so-called `ps`(placement seed) 
-
 ![oidhash](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c6_2.png) 
-
 Then we get **PGID**. Not long ago, I think pgid is a single value while it's not. **PGID** is a struct type variable comprising **poolid** and **ps**. 
-
 ![pgid](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c7.png) 
-
 But what is the input **x** of `crush_do_rule`? Let's move on. Then in `_pg_to_osds` there is a line `ps_t pps = pool.raw_pg_to_pps(pg); //placement ps`. the **pps** is **x**. How is **pps** calculated? In this function: `crush_hash32_2(CRUSH_HASH_RJENKINS1,ceph_stable_mod(pg.ps(), pgp_num, pgp_num_mask),pg.pool());` 
-
 ![hash32_2](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c9_2.png)
-
 `ps` **mod** `pgp_num_mask` and the result(i.e. `a`) hashes with **poolid**(`b`). That is what we call `pps`, i.e., **x**.
-
 ![x](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c11_2.png)
-
 so we get the input **x** of the second period.
 I draw a flow chart to show the first period.
-
 ![first period](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c13.png)
-
 P.S. you can find something in PG's name and object name.
 
 ### 2.2 PGID ---> OSD set
 Before we get started in this part, we must make clear several concepts.
 
 *weight* VS *reweight*
-
 ![weight&reweight](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c15.png)
 [ref](http://cephnotes.ksperis.com/blog/2014/12/23/difference-between-ceph-osd-reweight-and-ceph-osd-crush-reweight) here. 
 “**ceph osd crush reweight**” sets the CRUSH weight of the OSD. This weight is an arbitrary value (generally the size of the disk in TB or something) and controls how much data the system tries to allocate to the OSD.
