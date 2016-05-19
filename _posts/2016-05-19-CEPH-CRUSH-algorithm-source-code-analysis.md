@@ -147,7 +147,9 @@ As mentioned, crush_do_rule does crushrules **iteratively**. You can see the rul
 ![rules](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c21.png)
 
 step 1 put root rgw1 in `w`(enqueue);
+
 step 2 would run `crush_choose_firstn` to choose 1 rack-type bucket from root rgw1.
+
 Let's step into `crush_choose_firstn`.
 
 #### **crush_choose_firstn**
@@ -192,6 +194,7 @@ Then let's look into the loop:
 For **each** son bucket of the input bucket, for instance in the picture above, `rack1`, `crush_hash32_3` hashes `x`, `bucket id`(rack1's id), `r`(current selection's order number), these 3 variables into a `uint32_t` type value, then the result **&** `0xffff`, and then multiplies by `straw`(rack1's straw value, straw calculation seen below), finally we get this value, in one loop, for one son bucket(rack1 here). We calculate every son bucket all over the loop and pick the biggest. So a son bucket has been selected. Nice job! Here is the instance calculation process:
 
 ![straw_cal](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c24.png)
+
 So bucket -16 is selected, even its straw value is a little smaller.
 
 #### **Conclusion**
