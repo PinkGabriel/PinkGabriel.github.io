@@ -21,20 +21,20 @@ Firstly, we write an example c [code](https://github.com/PinkGabriel/CEPH_relate
 
 ## Contents
 
-* How to trace
- * Compile CEPH
- * Get function stack
-* Tracing process
- * input ---> PGID
- * PGID ---> OSD set
+* 1. How to trace
+ * 1.1 Compile CEPH
+ * 1.2 Get function stack
+* 2. Tracing process
+ * 2.1 input ---> PGID
+ * 2.2 PGID ---> OSD set
 
-## How to trace
+## 1. How to trace
 
-### 1. Compile CEPH
+### 1.1 Compile CEPH
 First of all, we should install CEPH using source code, and when doing `./configure`, we'll add compile flags like this `./configure CFLAGS='-g3 –O0' CXXFLAGS='-g3 –O0'`. `-g3` means MACRO infos is generated. `-O0` is **important**, it means shutdown the compiler optimization, if not, when using GDB following the program, most variables are optimized out. After configure, make and sudo make install.
 P.S. `-O0` only suits for **experimental** occasion, in production environment compiler optimization surely should be on.
 
-### 2. Get function stack
+### 1.2 Get function stack
 As we know, CRUSH core function is `crush_do_rule`(mapper.c line 785). By this function, we can divide the whole CRUSH calculation process into 2 periods: **input -> PGID** and **PGID -> OSD set**. For the first period, we use GDB to get the function stack:
 
 1. compile the example code with -g flag
@@ -60,11 +60,11 @@ The function stack is like this:
  #0 crush_do_rule
 ```
 
-## Tracing process
+## 2. Tracing process
 The CRUSH calculation can be summarized like this:
 **INPUT**(*object name & pool name*) ---> **PGID** ---> **OSD set**. In this article, we only focus on the calculation.
 
-### 1. input ---> PGID
+### 2.1 input ---> PGID
 All the funtions in the stack above do this work. You can read the source code following the orders. As a result, I'll list all the **crucial** transformations from input to pgid.
 
 First in `rados_ioctx_create`, `lookup_pool` get **poolid** by **pool name** and encapsulate poolid into a `librados::IoCtxImpl` type variable `ctx`;
@@ -103,7 +103,7 @@ I draw a flow chart to show the first period.
 
 P.S. you can find something in PG's name and object name.
 
-### 2. PGID ---> OSD set
+### 2.2 PGID ---> OSD set
 Before we get started in this part, we must make clear several concepts.
 
 #### **weight** VS **reweight**
