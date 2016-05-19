@@ -29,47 +29,47 @@ Firstly, we write an example c [code](https://github.com/PinkGabriel/CEPH_relate
 
 ### 1. Compile CEPH
 First of all, we should install CEPH using source code, and when doing `./configure`, we'll add compile flags like this `./configure CFLAGS='-g3 –O0' CXXFLAGS='-g3 –O0'`. `-g3` means MACRO infos is generated. `-O0` is **important**, it means shutdown the compiler optimization, if not, when using GDB following the program, most variables are optimized out. After configure, make and sudo make install.
-　　P.S. `-O0` only suits for **experimental** occasion, in production environment compiler optimization surely should be on.
+P.S. `-O0` only suits for **experimental** occasion, in production environment compiler optimization surely should be on.
 
 ### 2. Get function stack
 As we know, CRUSH core function is `crush_do_rule`(mapper.c line 785). By this function, we can divide the whole CRUSH calculation process into 2 periods: **input -> PGID** and **PGID -> OSD set**. For the first period, we use GDB to get the function stack:
-　　a. compile the example code with -g flag
-　　b. gdb [rados_write](https://github.com/PinkGabriel/CEPH_related/blob/master/librados_example/rados_write.c)
-　　c. then we enter the GDB interface. Before run we add a breakpoint:`b crush_do_rule`
-　　d. `r` and then we stop at the crush_do_rule function.
-　　e. `bt full` we'll get the function stack and we can print the debug info out to a file using GDB log. Then let's look deep into this process.
+ - a. compile the example code with -g flag
+ - b. gdb [rados_write](https://github.com/PinkGabriel/CEPH_related/blob/master/librados_example/rados_write.c)
+ - c. then we enter the GDB interface. Before run we add a breakpoint:`b crush_do_rule`
+ - d. `r` and then we stop at the crush_do_rule function.
+ - e. `bt full` we'll get the function stack and we can print the debug info out to a file using GDB log. Then let's look deep into this process.
 The function stack is like this:
-　　#12 main
-　　#11 rados_write
-　　#10 librados::IoCtxImpl::write
-　　#9 librados::IoCtxImpl::operate
-　　#8 Objecter::op_submit
-　　#7 Objecter::_op_submit_with_budget
-　　#6 Objecter::_op_submit
-　　#5 Objecter::_calc_target
-　　#4 OSDMap::pg_to_up_acting_osds
-　　#3 OSDMap::_pg_to_up_acting_osds
-　　#2 OSDMap::_pg_to_osds
-　　#1 CrushWrapper::do_rule
-　　#0 crush_do_rule
+ - #12 main
+ - #11 rados_write
+ - #10 librados::IoCtxImpl::write
+ - #9 librados::IoCtxImpl::operate
+ - #8 Objecter::op_submit
+ - #7 Objecter::_op_submit_with_budget
+ - #6 Objecter::_op_submit
+ - #5 Objecter::_calc_target
+ - #4 OSDMap::pg_to_up_acting_osds
+ - #3 OSDMap::_pg_to_up_acting_osds
+ - #2 OSDMap::_pg_to_osds
+ - #1 CrushWrapper::do_rule
+ - #0 crush_do_rule
 
 ## Tracing process
 The CRUSH calculation can be summarized like this:
 **INPUT**(*object name & pool name*) ---> **PGID** ---> **OSD set**. In this article, we only focus on the calculation.
 ### 1. input ---> PGID
 All the funtions in the stack above do this work. You can read the source code following the orders. As a result, I'll list all the **crucial** transformations from input to pgid.
-　　a. First in `rados_ioctx_create`, `lookup_pool` get **poolid** by **pool name** and encapsulate poolid into a `librados::IoCtxImpl` type variable `ctx`;
-　　b. Then in `rados_write` **object name** is encapsulated into **oid**;
+ - a. First in `rados_ioctx_create`, `lookup_pool` get **poolid** by **pool name** and encapsulate poolid into a `librados::IoCtxImpl` type variable `ctx`;
+ - b. Then in `rados_write` **object name** is encapsulated into **oid**;
 And then in `librados::IoCtxImpl::operate`, **oid** and **oloc**(comprising **poolid**) are packed into a `Objecter::Op *` type variable **objecter_op**;
-　　c. Through all kinds of encapsulations, we arrive at this level: `_calc_target`. We get still unchanged **oid** and **poolid**. And we read out the informations of the target **pool**.
+ - c. Through all kinds of encapsulations, we arrive at this level: `_calc_target`. We get still unchanged **oid** and **poolid**. And we read out the informations of the target **pool**.
 ![oid&oloc](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c2.png)
 ![pool](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c3_2.png)
 (in my cluster, pool "neo" id is 29, name of object to write is "neo-obj")
-　　d. In `object_locator_to_pg`, the **first calculation** begins: `ceph_str_hash` hashes object name into a `uint32_t` type value as so-called `ps`(placement seed)
+ - d. In `object_locator_to_pg`, the **first calculation** begins: `ceph_str_hash` hashes object name into a `uint32_t` type value as so-called `ps`(placement seed)
 ![oidhash](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c6_2.png)
-　　e. Then we get **PGID**. Not long ago, I think pgid is a single value while it's not. **PGID** is a struct type variable comprising **poolid** and **ps**.
+ - e. Then we get **PGID**. Not long ago, I think pgid is a single value while it's not. **PGID** is a struct type variable comprising **poolid** and **ps**.
 ![pgid](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c7.png)
-　　f. But what is the input **x** of `crush_do_rule`? Let's move on. Then in `_pg_to_osds` there is a line `ps_t pps = pool.raw_pg_to_pps(pg); //placement ps`. the **pps** is **x**. How is **pps** calculated? In this function: `crush_hash32_2(CRUSH_HASH_RJENKINS1,ceph_stable_mod(pg.ps(), pgp_num, pgp_num_mask),pg.pool());` 
+ - f. But what is the input **x** of `crush_do_rule`? Let's move on. Then in `_pg_to_osds` there is a line `ps_t pps = pool.raw_pg_to_pps(pg); //placement ps`. the **pps** is **x**. How is **pps** calculated? In this function: `crush_hash32_2(CRUSH_HASH_RJENKINS1,ceph_stable_mod(pg.ps(), pgp_num, pgp_num_mask),pg.pool());` 
 ![hash32_2](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c9.png)
 `ps` mod `pgp_num_mask` and the result(i.e. `a`) hashes with **poolid**(`b`). That is what we call pps, i.e., **x**.
 ![x](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c11_2.png)
@@ -93,11 +93,11 @@ Primary affinity is 1 by default (i.e., an OSD may act as a primary). You may se
 pg-num is the number of PGs, pgp-num is the number of PGs that will be considered for placement, i.e. it's the pgp-num value that is used by CRUSH, not pg-num. For example, consider pg-num = 1024 and pgp-num = 1. In that case you will see 1024 PGs but all of those PGs will map to the same set of OSDs. When you increase pg-num you are splitting PGs, when you increase pgp-num you are moving them, i.e. changing sets of OSDs they map to.
 PG and PGP are important concepts. More discuss can be seen [here](http://lists.ceph.com/pipermail/ceph-users-ceph.com/2015-May/001610.html)
 
-　　OK let's continue tracing the code. We continue at `do_rule`:
+OK let's continue tracing the code. We continue at `do_rule`:
 ```
 void do_rule(int rule, int x, vector<int>& out, int maxout, const vector<__u32>& weight)
 ```
-　　Let's see some parameters in runtime. `x` is the `pps` we've got, rule is the crushrule's number in memory(not ruleid, in my crushrule set, this rule's id is 3), `weight` is **reweight** we've mentioned and it's scaled up from 1 to 65536. Then we define `rawout[maxout]` to store OSD set, `scratch[maxout * 3]` for calculation use. Then we go into **crush_do_rule**.
+Let's see some parameters in runtime. `x` is the `pps` we've got, rule is the crushrule's number in memory(not ruleid, in my crushrule set, this rule's id is 3), `weight` is **reweight** we've mentioned and it's scaled up from 1 to 65536. Then we define `rawout[maxout]` to store OSD set, `scratch[maxout * 3]` for calculation use. Then we go into **crush_do_rule**.
 ![2nd](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c16.png)
 ![2nd](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c17.png)
 
@@ -110,8 +110,8 @@ Next, we'll look into 3 functions:
 #### **crush_do_rule**
 First here is my crushrule of the target pool and my cluster hierarchy:
 ![clusterinfo](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c19.png)
-　　what is worth mentioning, **step emit** is typically used at the end of a rule, but may also be used to pick from **different trees** in the same rule. More detailed can be seen at offical [site](http://docs.ceph.com/docs/master/rados/operations/crush-map/#crush-map-rules).
-　　In this function there are several important variables: `scratch[3 * result_max]` and `a`, `b`, `c` points to 0, 1/3, 2/3 locations of scratch array. And make `w = a`, `o = b`. `w` is used as a FIFO queue for taking a BFS traversal in CRUSH map. `o` stores the results of `crush_choose_firstn`. `c` stores the final OSD set result. After each `crush_choose_firstn`, if the results are not OSD, `o` exchanges with `w`. So `w` would be the input of the next call of `crush_choose_firstn`.
+what is worth mentioning, **step emit** is typically used at the end of a rule, but may also be used to pick from **different trees** in the same rule. More detailed can be seen at offical [site](http://docs.ceph.com/docs/master/rados/operations/crush-map/#crush-map-rules).
+In this function there are several important variables: `scratch[3 * result_max]` and `a`, `b`, `c` points to 0, 1/3, 2/3 locations of scratch array. And make `w = a`, `o = b`. `w` is used as a FIFO queue for taking a BFS traversal in CRUSH map. `o` stores the results of `crush_choose_firstn`. `c` stores the final OSD set result. After each `crush_choose_firstn`, if the results are not OSD, `o` exchanges with `w`. So `w` would be the input of the next call of `crush_choose_firstn`.
 As mentioned, crush_do_rule does crushrules **iteratively**. You can see the rules in memory:
 ![rules](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c21.png)
 step 1 put root rgw1 in `w`(enqueue);
@@ -120,7 +120,7 @@ Let's step into `crush_choose_firstn`.
 
 #### **crush_choose_firstn**
 This function chooses buckets or devices of specified type **recursively** and would deal with collision, failure occasion.
-　　if the step is a **choose** step, the function would call `crush_bucket_choose` to do the **direct** choose; if the step is a **chooseleaf** step, the function would run recursively until it gets leaf nodes.
+if the step is a **choose** step, the function would call `crush_bucket_choose` to do the **direct** choose; if the step is a **chooseleaf** step, the function would run recursively until it gets leaf nodes.
 #### **crush_bucket_choose**
 This is the ***most important*** function in CRUSH. Because default bucket type is **straw** and in most occasions we would use straw bucket, we'll look into `bucket_straw_choose`:
 call:
