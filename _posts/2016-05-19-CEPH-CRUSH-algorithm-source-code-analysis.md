@@ -45,19 +45,19 @@ As we know, CRUSH core function is `crush_do_rule`(mapper.c line 785). By this f
 
 The function stack is like this:
 ```
- #12 main
- #11 rados_write
- #10 librados::IoCtxImpl::write
- #9 librados::IoCtxImpl::operate
- #8 Objecter::op_submit
- #7 Objecter::_op_submit_with_budget
- #6 Objecter::_op_submit
- #5 Objecter::_calc_target
- #4 OSDMap::pg_to_up_acting_osds
- #3 OSDMap::_pg_to_up_acting_osds
- #2 OSDMap::_pg_to_osds
- #1 CrushWrapper::do_rule
- #0 crush_do_rule
+#12 main 
+#11 rados_write 
+#10 librados::IoCtxImpl::write 
+#9 librados::IoCtxImpl::operate 
+#8 Objecter::op_submit 
+#7 Objecter::_op_submit_with_budget
+#6 Objecter::_op_submit
+#5 Objecter::_calc_target
+#4 OSDMap::pg_to_up_acting_osds
+#3 OSDMap::_pg_to_up_acting_osds
+#2 OSDMap::_pg_to_osds
+#1 CrushWrapper::do_rule
+#0 crush_do_rule
 ```
 
 ## 2. Tracing process
