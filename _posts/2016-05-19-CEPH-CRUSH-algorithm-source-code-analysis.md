@@ -72,7 +72,9 @@ All the funtions in the stack above do this work. You can read the source code f
 And then in `librados::IoCtxImpl::operate`, **oid** and **oloc**(comprising **poolid**) are packed into a `Objecter::Op *` type variable **objecter_op**;
 3. Through all kinds of encapsulations, we arrive at this level: `_calc_target`. We get still unchanged **oid** and **poolid**. And we read out the informations of the target **pool**.
 ![oid&oloc](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c2.png)
+
 ![pool](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c3_2.png)
+
 (in my cluster, pool "neo" id is 29, name of object to write is "neo-obj")
 
 4. In `object_locator_to_pg`, the **first calculation** begins: `ceph_str_hash` hashes object name into a `uint32_t` type value as so-called `ps`(placement seed)
