@@ -21,12 +21,12 @@ Firstly, we write an example c [code](https://github.com/PinkGabriel/CEPH_relate
 
 ## Contents
 
-* 1. How to trace
- * 1.1 Compile CEPH
- * 1.2 Get function stack
-* 2. Tracing process
- * 2.1 input ---> PGID
- * 2.2 PGID ---> OSD set
+* How to trace  
+  * Compile CEPH  
+  * Get function stack  
+* Tracing process  
+  * input ---> PGID  
+  * PGID ---> OSD set  
 
 ## 1. How to trace
 
@@ -90,7 +90,7 @@ Then we get **PGID**. Not long ago, I think pgid is a single value while it's no
 
 But what is the input **x** of `crush_do_rule`? Let's move on. Then in `_pg_to_osds` there is a line `ps_t pps = pool.raw_pg_to_pps(pg); //placement ps`. the **pps** is **x**. How is **pps** calculated? In this function: `crush_hash32_2(CRUSH_HASH_RJENKINS1,ceph_stable_mod(pg.ps(), pgp_num, pgp_num_mask),pg.pool());` 
 
-![hash32_2](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c9.png)
+![hash32_2](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c9_2.png)
 
 `ps` **mod** `pgp_num_mask` and the result(i.e. `a`) hashes with **poolid**(`b`). That is what we call `pps`, i.e., **x**.
 
