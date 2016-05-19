@@ -71,14 +71,22 @@ All the funtions in the stack above do this work. You can read the source code f
 2. Then in `rados_write` **object name** is encapsulated into **oid**;
 And then in `librados::IoCtxImpl::operate`, **oid** and **oloc**(comprising **poolid**) are packed into a `Objecter::Op *` type variable **objecter_op**;
 3. Through all kinds of encapsulations, we arrive at this level: `_calc_target`. We get still unchanged **oid** and **poolid**. And we read out the informations of the target **pool**.
+
 ![oid&oloc](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c2.png)
+
 ![pool](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c3_2.png)
+
 (in my cluster, pool "neo" id is 29, name of object to write is "neo-obj")
 4. In `object_locator_to_pg`, the **first calculation** begins: `ceph_str_hash` hashes object name into a `uint32_t` type value as so-called `ps`(placement seed)
+
 ![oidhash](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c6_2.png)
+
 5. Then we get **PGID**. Not long ago, I think pgid is a single value while it's not. **PGID** is a struct type variable comprising **poolid** and **ps**.
+
 ![pgid](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c7.png)
+
 6. But what is the input **x** of `crush_do_rule`? Let's move on. Then in `_pg_to_osds` there is a line `ps_t pps = pool.raw_pg_to_pps(pg); //placement ps`. the **pps** is **x**. How is **pps** calculated? In this function: `crush_hash32_2(CRUSH_HASH_RJENKINS1,ceph_stable_mod(pg.ps(), pgp_num, pgp_num_mask),pg.pool());` 
+
 ![hash32_2](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c9.png)
 
 `ps` mod `pgp_num_mask` and the result(i.e. `a`) hashes with **poolid**(`b`). That is what we call pps, i.e., **x**.
@@ -129,7 +137,9 @@ Next, we'll look into 3 functions:
 
 #### **crush_do_rule**
 First here is my crushrule of the target pool and my cluster hierarchy:
+
 ![clusterinfo](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c19.png)
+
 what is worth mentioning, **step emit** is typically used at the end of a rule, but may also be used to pick from **different trees** in the same rule. More detailed can be seen at offical [site](http://docs.ceph.com/docs/master/rados/operations/crush-map/#crush-map-rules).
 In this function there are several important variables: `scratch[3 * result_max]` and `a`, `b`, `c` points to 0, 1/3, 2/3 locations of scratch array. And make `w = a`, `o = b`. `w` is used as a FIFO queue for taking a BFS traversal in CRUSH map. `o` stores the results of `crush_choose_firstn`. `c` stores the final OSD set result. After each `crush_choose_firstn`, if the results are not OSD, `o` exchanges with `w`. So `w` would be the input of the next call of `crush_choose_firstn`.
 As mentioned, crush_do_rule does crushrules **iteratively**. You can see the rules in memory:
@@ -174,10 +184,13 @@ static int bucket_straw_choose(struct crush_bucket_straw *bucket,
 }
 ```
 Let's see the variables in runtime:
+
 ![straw](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c22_2.png)
+
 We can see, the bucket `root rgw1`'s id is -1, `type = 10` means root, `alg = 4` means straw type. Here the `weight` is the OSD weight we set scales up by 65536(i.e. 37 * 65536 = 2424832).
 Then let's look into the loop:
 For **each** son bucket of the input bucket, for instance in the picture above, `rack1`, `crush_hash32_3` hashes `x`, `bucket id`(rack1's id), `r`(current selection's order number), these 3 variables into a `uint32_t` type value, then the result **&** `0xffff`, and then multiplies by `straw`(rack1's straw value, straw calculation seen below), finally we get this value, in one loop, for one son bucket(rack1 here). We calculate every son bucket all over the loop and pick the biggest. So a son bucket has been selected. Nice job! Here is the instance calculation process:
+
 ![straw_cal](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c24.png)
 So bucket -16 is selected, even its straw value is a little smaller.
 
