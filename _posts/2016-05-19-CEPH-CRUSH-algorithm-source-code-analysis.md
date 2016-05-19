@@ -71,17 +71,21 @@ All the funtions in the stack above do this work. You can read the source code f
 2. Then in `rados_write` **object name** is encapsulated into **oid**;
 And then in `librados::IoCtxImpl::operate`, **oid** and **oloc**(comprising **poolid**) are packed into a `Objecter::Op *` type variable **objecter_op**;
 3. Through all kinds of encapsulations, we arrive at this level: `_calc_target`. We get still unchanged **oid** and **poolid**. And we read out the informations of the target **pool**. 
+4. 
 ![oid&oloc](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c2.png) 
+
 ![pool](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c3_2.png) 
 (in my cluster, pool "neo" id is 29, name of object to write is "neo-obj") 
 4. In `object_locator_to_pg`, the **first calculation** begins: `ceph_str_hash` hashes object name into a `uint32_t` type value as so-called `ps`(placement seed) 
+
 ![oidhash](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c6_2.png) 
 5. Then we get **PGID**. Not long ago, I think pgid is a single value while it's not. **PGID** is a struct type variable comprising **poolid** and **ps**. 
+
 ![pgid](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c7.png) 
 6. But what is the input **x** of `crush_do_rule`? Let's move on. Then in `_pg_to_osds` there is a line `ps_t pps = pool.raw_pg_to_pps(pg); //placement ps`. the **pps** is **x**. How is **pps** calculated? In this function: `crush_hash32_2(CRUSH_HASH_RJENKINS1,ceph_stable_mod(pg.ps(), pgp_num, pgp_num_mask),pg.pool());` 
-![hash32_2](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c9.png)
 
-`ps` mod `pgp_num_mask` and the result(i.e. `a`) hashes with **poolid**(`b`). That is what we call pps, i.e., **x**.
+![hash32_2](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c9.png)
+`ps` **mod** `pgp_num_mask` and the result(i.e. `a`) hashes with **poolid**(`b`). That is what we call `pps`, i.e., **x**.
 
 ![x](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c11_2.png)
 
