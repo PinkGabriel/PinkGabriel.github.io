@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      CEPH CRUSH source code analysis
+title:      CEPH CRUSH algorithm source code analysis
 date:	    2016-5-19
 summary:    CRUSH algorithm analysis
 categories: Original
