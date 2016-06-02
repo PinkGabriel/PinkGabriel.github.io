@@ -135,7 +135,7 @@ Let's see some parameters in runtime. `x` is the `pps` we've got, rule is the cr
 ![2nd](http://o7dj8mc3t.bkt.clouddn.com/blog_crush/c17.png)
 
 #### **PGID -> OSDset OUTLINE**
-Next, we'll look into 3 functions:
+Next, we'll look into 3 functions below. BTW, `firstn` means replica storage, CRUSH need to select n osds to store these n replicas. `indep` means erasure code storage. We only focus on replica method. 
 
 * **`crush_do_rule`**: do crushrules **iteratively**
 * **`crush_choose_firstn`**: choose buckets or devices of specified type **recursively**
