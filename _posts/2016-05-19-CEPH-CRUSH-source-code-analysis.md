@@ -11,14 +11,14 @@ tags:
  - GDB
 ---
 
-# CEPH CRUSH algorithm source code analysis
+# CEPH CRUSH source code analysis
 
 
 ## Before all
-Before reading this article, you need to be familiar with CEPH's basic operations on Pools and CRUSH maps.
+Before reading this article, you need to be familiar with CEPH's basic operations on Pools and CRUSH maps, and have a preliminary reading about the source code.
 
 ## Analysis method
-Firstly, we write an example c [code](https://github.com/PinkGabriel/CEPH_related/blob/master/librados_example/rados_write.c) invoking  librados to write an object to a pool. Then we use GDB(CGDB is recommended) to trace the program running meanwhile we'll focus on some variables related to CRUSH. So we'll know how CRUSH exactly runs in the source code.
+Firstly, we write an example c [code](https://github.com/PinkGabriel/CEPH_related/blob/master/librados_example/rados_write.c) invoking  **librados** to write an object to a pool. Then we use GDB(CGDB is recommended) to trace the program running meanwhile we'll focus on some variables related to CRUSH. So we'll know how CRUSH exactly runs in the source code.
 
 ## Contents
 
@@ -137,9 +137,9 @@ Let's see some parameters in runtime. `x` is the `pps` we've got, rule is the cr
 #### **PGID -> OSDset OUTLINE**
 Next, we'll look into 3 functions:
 
-**`crush_do_rule`**: do crushrules **iteratively**
-**`crush_choose_firstn`**: choose buckets or devices of specified type **recursively**
-**`crush_bucket_choose`**: **directly** choose a son of the input bucket
+* **`crush_do_rule`**: do crushrules **iteratively**
+* **`crush_choose_firstn`**: choose buckets or devices of specified type **recursively**
+* **`crush_bucket_choose`**: **directly** choose a son of the input bucket
 
 #### **crush_do_rule**
 First here is my crushrule of the target pool and my cluster hierarchy:
