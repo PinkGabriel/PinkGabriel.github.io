@@ -11,9 +11,6 @@ tags:
  - GDB
 ---
 
-# CEPH CRUSH source code analysis
-
-
 ## Before all
 Before reading this article, you need to be familiar with CEPH's basic operations on Pools and CRUSH maps, and have a preliminary reading about the source code.
 
