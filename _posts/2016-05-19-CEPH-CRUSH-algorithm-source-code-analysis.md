@@ -12,7 +12,7 @@ tags:
 ---
 
 ## Before all
-Before reading this article, you need to be familiar with CEPH's basic operations on Pools and CRUSH maps, and have a preliminary reading about the source code.
+Before reading this article, you need to be familiar with CEPH's basic operations on Pools and CRUSH maps, and have a preliminary reading about the source code. (welcome to my [csdn blog](http://blog.csdn.net/snow168rain/article/details/51612364)~~~)
 
 ## Analysis method
 Firstly, we write an example c [code](https://github.com/PinkGabriel/CEPH_related/blob/master/librados_example/rados_write.c) invoking  **librados** to write an object to a pool. Then we use GDB(CGDB is recommended) to trace the program running meanwhile we'll focus on some variables related to CRUSH. So we'll know how CRUSH exactly runs in the source code.
