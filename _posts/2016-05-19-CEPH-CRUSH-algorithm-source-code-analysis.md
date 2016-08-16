@@ -29,7 +29,7 @@ Firstly, we write an example c [code](https://github.com/PinkGabriel/CEPH_relate
 ## 1. How to trace
 
 ### 1.1 Compile CEPH
-First of all, we should install CEPH using source code, and when doing `./configure`, we'll add compile flags like this `./configure CFLAGS='-g3 –O0' CXXFLAGS='-g3 –O0'`. `-g3` means MACRO infos is generated. `-O0` is **important**, it means shutdown the compiler optimization, if not, when using GDB following the program, most variables are optimized out. After configure, make and sudo make install.
+First of all, we should install CEPH using source code, and when doing `./configure`, we'll add compile flags like this `./configure CFLAGS='-g3 -O0' CXXFLAGS='-g3 -O0'`. `-g3` means MACRO infos is generated. `-O0` is **important**, it means shutdown the compiler optimization, if not, when using GDB following the program, most variables are optimized out. After configure, make and sudo make install.
 P.S. `-O0` only suits for **experimental** occasion, in production environment compiler optimization surely should be on.
 
 ### 1.2 Get function stack
